@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tez Yordam Xizmati</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+        .container {
+            margin: 20px auto;
+            max-width: 600px;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            margin-top: 0;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .hidden {
+            display: none;
+        }
+        textarea, input {
+            width: calc(100% - 40px);
+            margin: 10px auto;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container" id="role-selection">
+        <h1>Tez Yordam Xizmati</h1>
+        <p>Iltimos, o'z rolingizni tanlang:</p>
+        <button onclick="selectRole('patient')">Bemor</button>
+        <button onclick="selectRole('doctor')">Shifokor</button>
+    </div>
+
+  
+    <div class="container hidden" id="patient-interface">
+        <h2>Bemor Uchun</h2>
+        <button onclick="callAmbulance()">Tez Yordamni Chaqarish</button>
+        <button onclick="getLocation()">Manzilni Belgilash</button>
+        <input type="text" id="patient-name" placeholder="Ism va familiya">
+        <input type="number" id="patient-age" placeholder="Yoshi">
+        <textarea id="patient-condition" placeholder="Kasallik haqida ma'lumot..."></textarea>
+        
+        <button onclick="goBack()">Orqaga qaytish</button>
+    </div>
+    
+    <div class="container hidden" id="doctor-interface">
+        <h2>Shifokor Uchun Ma'lumotlar</h2>
+        <p>Bemor haqida ma'lumotlar:</p>
+        <p><strong>Ism va familiya:</strong> <span id="doctor-patient-name">-</span></p>
+        <p><strong>Yoshi:</strong> <span id="doctor-patient-age">-</span></p>
+        <p><strong>Kasalligi:</strong> <span id="doctor-patient-condition">-</span></p>
+        <p><strong>Manzili:</strong> <span id="doctor-patient-location">-</span></p>
+       
+        <button onclick="goBack()">Orqaga qaytish</button>
+    </div>
+    
+   
+        
+    <div class="map">
+        
+        <iframe 
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d306922.0028475758!2d71.70705051122658!3d40.38331174487879!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x38bcd4d3587d880d%3A0x63ef2678dbba88f4!2sFergana!5e0!3m2!1sen!2s!4v1676761234567" 
+            allowfullscreen="" 
+            loading="lazy"></iframe>
+    </div>
+    <div id="map-container">
+        <h3>Farg‘ona Marshrutlar Xaritasi</h3>
+        <div id="map" style="height: 400px; width: 100%;"></div>
+    </div>
+    <script>
+        function selectRole(role) {
+            document.getElementById('role-selection').classList.add('hidden');
+            if (role === 'patient') {
+                document.getElementById('patient-interface').classList.remove('hidden');
+            } else if (role === 'doctor') {
+                document.getElementById('doctor-interface').classList.remove('hidden');
+    
+                // Shifokor oynasida bemor ma'lumotlarini ko'rsatish
+                document.getElementById('doctor-patient-name').textContent = localStorage.getItem('patientName') || '-';
+                document.getElementById('doctor-patient-age').textContent = localStorage.getItem('patientAge') || '-';
+                document.getElementById('doctor-patient-condition').textContent = localStorage.getItem('patientCondition') || '-';
+                document.getElementById('doctor-patient-location').textContent = localStorage.getItem('patientLocation') || 'Manzil belgilanmagan';
+                
+            }
+        }
+    
+        function callAmbulance() {
+            alert("Tez yordam chaqirilmoqda...");
+            window.location.href = "tel:+998937364904";
+        }
+    
+        function getLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    const location = `Lat: ${position.coords.latitude}, Lng: ${position.coords.longitude}`;
+                    alert(`Manzilingiz: ${location}`);
+                    localStorage.setItem('patientLocation', location);
+                }, function () {
+                    alert("Manzilni aniqlab bo'lmadi");
+                });
+            } else {
+                alert("Brauzer geolokatsiyani qo'llab-quvvatlamaydi");
+            }
+        }
+    
+        function goBack() {
+            document.querySelectorAll('.container').forEach(container => container.classList.add('hidden'));
+            document.getElementById('role-selection').classList.remove('hidden');
+        }
+    
+        document.getElementById('patient-name').addEventListener('input', function (e) {
+            localStorage.setItem('patientName', e.target.value);
+        });
+    
+        document.getElementById('patient-age').addEventListener('input', function (e) {
+            localStorage.setItem('patientAge', e.target.value);
+        });
+    
+        document.getElementById('patient-condition').addEventListener('input', function (e) {
+            localStorage.setItem('patientCondition', e.target.value);
+        });
+    </script>
+</body>
+</html>
